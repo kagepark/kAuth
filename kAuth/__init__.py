@@ -1,12 +1,17 @@
 import os
 import ast
-import crypt # password
-import pyotp # otp
 import random
-import pyqrcode
-import kmisc as km
+from kmport import *
 from datetime import datetime
-from simplepam import authenticate # Check of linux system authenticate 
+#from simplepam import authenticate 
+#from cryptography.fernet import Fernet
+
+Import('import crypt')
+Import('import pyotp')
+Import('import pyqrcode')
+Install('simplepam')  # Check of linux system authenticate 
+from simplepam import authenticate  # Check of linux system authenticate 
+Install('cryptography')
 from cryptography.fernet import Fernet
 
 KeyKey=b'7_4y35QSzPgBO7UnrMeZNzmZFbOOkoP7l0FSR-D-Anw='
@@ -23,14 +28,14 @@ def req_passwd(a):
     nc=False
     sc=False
     for i in a:
-        if RI and i in require_lower: lc=True
-        if RC and i in require_capital: Lc=True
-        if RI and i in require_int: nc=True
-        if RS and i in require_symbols: sc=True
-    if lc and LC and nc and sc:
+        if  i in require_lower: lc=True
+        if  i in require_capital: Lc=True
+        if  i in require_int: nc=True
+        if  i in require_symbols: sc=True
+    if lc and Lc and nc and sc:
         return True
     if not lc: return 'lc'
-    if not lc: return 'Lc'
+    if not Lc: return 'Lc'
     if not lc: return 'nc'
     if not lc: return 'sc'
     return False
@@ -68,20 +73,20 @@ def gen_random(req=['str','int','sym'],length=8):
     return ''.join(src_a)
 
 def enc_passwd(source):
-    return km.Str(keyfer.encrypt(source.encode()))
+    return Str(keyfer.encrypt(source.encode()))
 
 def dec_passwd(source):
-    return keyfer.decrypt(km.Bytes(source)).decode()
+    return keyfer.decrypt(Bytes(source)).decode()
 
 def enc_key(**source):
     # convert dictionary to string
     str_source='''{}'''.format(source)
-    return km.Str(keyfer.encrypt(str_source.encode()))
+    return Str(keyfer.encrypt(str_source.encode()))
 
 def dec_key(key):
     # convert string to dictionary
     try:
-        dkey=keyfer.decrypt(km.Bytes(key)).decode()
+        dkey=keyfer.decrypt(Bytes(key)).decode()
     except:
         return {}
     try:
@@ -108,7 +113,7 @@ def is_right_email(source):
 def update_password_to_system(username,passwd):
     #update password to username on the linux system
     pass_env=crypt.crypt(passwd)
-    rt=km.rshell('''echo '%s:%s' | chpasswd -e'''%(username,pass_env))
+    rt=rshell('''echo '%s:%s' | chpasswd -e'''%(username,pass_env))
     if rt[0]==0:
         return True
     return False
