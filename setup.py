@@ -30,9 +30,9 @@ def lib_ver():
             return ver_a[1]
     return 1.0
 
-pkg_name='kDic'
-pkg_desc='Extended Dictionary'
-pkg_git="https://github.com/kagepark/kDict"
+pkg_name='kAuth'
+pkg_desc='Authentication'
+pkg_git="https://github.com/kagepark/kAuth"
 long_description=''
 if os.path.isfile('README.md'):
     with open("README.md", "r") as fh:

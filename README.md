@@ -23,6 +23,9 @@ pip3 install kAuth
    1. send_otp_to_email()              : Send my opt number to email
    1. verify_otp()                     : Verify OTP number
 
+1. requirements
+requirement package names are crypt, pyotp, pyqrcode, kmisc
+
 1. Initialize Auth method  
 
 ```javascript
