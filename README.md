@@ -32,13 +32,13 @@ requirement package names are crypt, pyotp, pyqrcode, kmisc
 import kAuth 
 ```
 
-- is_right_password() : Check right password or not
- -- default check everything
- -- RL=True/False : Check Low characters
- -- RC=True/False : Check Capital characters
- -- RI=True/False : Check Integer (0-9)
- -- RS=True/False : Check Symbols
- -- LN=8          : Password length (default 8)
+1. is_right_password() : Check right password or not
+ - default check everything
+ - RL=True/False : Check Low characters
+ - RC=True/False : Check Capital characters
+ - RI=True/False : Check Integer (0-9)
+ - RS=True/False : Check Symbols
+ - LN=8          : Password length (default 8)
 
 ```javascript
 >>> password='Test Password'
@@ -49,14 +49,14 @@ import kAuth
         print(rt[1])
 ```
 
-- gen_random() : generate random string
- -- req=[,,] : requirements
-   --- 'str'     : Strings (Capital and Lower)
-   --- 'lower'   : lower strings
-   --- 'captial' : Capital strings
-   --- 'int'     : integer (0-9)
-   --- 'sym'     : symbols
- -- length   : make a string length (default 8)
+1. gen_random() : generate random string
+ - req=[,,] : requirements
+   - 'str'     : Strings (Capital and Lower)
+   - 'lower'   : lower strings
+   - 'captial' : Capital strings
+   - 'int'     : integer (0-9)
+   - 'sym'     : symbols
+ - length   : make a string length (default 8)
 
 ```javascript
 >>> print(gen_random(req=['lower','int'],length=12))
