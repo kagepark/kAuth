@@ -100,14 +100,18 @@ def is_right_domain(source):
     # code here
     return True
 
-def is_right_email(source):
+def is_right_email(source,local=False):
     if isinstance(source,str):
-        src_a=source.split('@')
-        if len(src_a) == 2:
-            username=src_a[0]
-            domain=src_a[1]
-            if is_right_domain(domain):
+        if local:
+            if os.path.isdir(os.path.join('/home',source)):
                 return True
+        else:
+            src_a=source.split('@')
+            if len(src_a) == 2:
+                username=src_a[0]
+                domain=src_a[1]
+                if is_right_domain(domain):
+                    return True
     return False
 
 def update_password_to_system(username,passwd):
@@ -120,7 +124,7 @@ def update_password_to_system(username,passwd):
 
 def check_password_to_system(username,passwd):
     #if username and password is right on the linux system then return True, default False
-    if authenticate(username,passwd):
+    if authenticate(str(username),str(passwd)):
         return True
     return False
 
@@ -135,22 +139,45 @@ def read_otp_key_from_user_account(username):
             return my_key[0]
     return False
 
-def send_otp_to_email(my_key,email=False):
-    totp=pyotp.TOTP(my_key)
-    for i in range(0,30):
-        if int(totp.interval - datetime.datetime.now().timestamp() % totp.interval) > 20:
-            os.system('''echo {} | mail -s "OTP" {}'''.format(totp.now(),username))
-            return True
-    return False
-
-def verify_otp(username,otp):
+def get_otp(username):
     my_key=read_otp_key_from_user_account(username)
     if my_key:
         try:
-            myotp=pyotp.TOTP(my_key)
-            if myotp.verify(otp):
-                return True
+            return pyotp.TOTP(my_key)
         except:
             pass
     return False
-    
+
+def get_otp_num(username,myotp=None):
+    if myotp is None: myotp=get_otp(username)
+    if myotp:
+        try:
+            return myotp.now()
+        except:
+            pass
+    return False
+
+def otp_remain_time(myotp):
+    try:
+        return int(myotp.interval - datetime.now().timestamp() % myotp.interval)
+    except:
+        pass
+    return False
+
+def send_otp_to_email(myotp,email_title='OTP',email_addr=None,local=False,minimum_time=20):
+    rt=False,'NA'
+    if is_right_email(email_addr,local=local):
+        for i in range(0,30):
+            if otp_remain_time(myotp) > minimum_time:
+                rt=rshell('''echo {} | mail -s "{}" {}'''.format(myotp.now(),email_title,email_addr))
+                if rt[0] == 0:
+                    return True,'OK'
+            time.sleep(1)
+    return False,rt[1]
+
+def verify_otp_num(username,otp_num,myotp=None):
+    if myotp is None: myotp=get_otp(username)
+    if myotp:
+        if myotp.verify(otp_num):
+            return True
+    return False
