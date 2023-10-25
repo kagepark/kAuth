@@ -181,3 +181,10 @@ def verify_otp_num(username,otp_num,myotp=None):
         if myotp.verify(otp_num):
             return True
     return False
+
+def gen_otp_key():
+    return '''{}
+" RATE_LIMIT 3 30 1698214675
+" DISALLOW_REUSE 56607154 56607155
+" TOTP_AUTH
+'''.format(pyotp.random_base32())
