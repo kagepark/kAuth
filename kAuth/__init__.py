@@ -1,17 +1,17 @@
 import os
 import ast
 import random
-from kmport import *
+import kmisc as km
 from datetime import datetime
 #from simplepam import authenticate 
 #from cryptography.fernet import Fernet
 
-Import('import crypt')
-Import('import pyotp')
-Import('import pyqrcode')
-Install('simplepam')  # Check of linux system authenticate 
+km.Import('import crypt')
+km.Import('import pyotp')
+#km.Import('import pyqrcode')
+km.Install('simplepam')  # Check of linux system authenticate 
 from simplepam import authenticate  # Check of linux system authenticate 
-Install('cryptography')
+km.Install('cryptography')
 from cryptography.fernet import Fernet
 
 KeyKey=b'7_4y35QSzPgBO7UnrMeZNzmZFbOOkoP7l0FSR-D-Anw='
@@ -73,20 +73,20 @@ def gen_random(req=['str','int','sym'],length=8):
     return ''.join(src_a)
 
 def enc_passwd(source):
-    return Str(keyfer.encrypt(source.encode()))
+    return km.Str(keyfer.encrypt(source.encode()))
 
 def dec_passwd(source):
-    return keyfer.decrypt(Bytes(source)).decode()
+    return keyfer.decrypt(km.Bytes(source)).decode()
 
 def enc_key(**source):
     # convert dictionary to string
     str_source='''{}'''.format(source)
-    return Str(keyfer.encrypt(str_source.encode()))
+    return km.Str(keyfer.encrypt(str_source.encode()))
 
 def dec_key(key):
     # convert string to dictionary
     try:
-        dkey=keyfer.decrypt(Bytes(key)).decode()
+        dkey=keyfer.decrypt(km.Bytes(key)).decode()
     except:
         return {}
     try:
@@ -96,28 +96,10 @@ def dec_key(key):
     except:
          return dkey
 
-def is_right_domain(source):
-    # code here
-    return True
-
-def is_right_email(source,local=False):
-    if isinstance(source,str):
-        if local:
-            if os.path.isdir(os.path.join('/home',source)):
-                return True
-        else:
-            src_a=source.split('@')
-            if len(src_a) == 2:
-                username=src_a[0]
-                domain=src_a[1]
-                if is_right_domain(domain):
-                    return True
-    return False
-
 def update_password_to_system(username,passwd):
     #update password to username on the linux system
     pass_env=crypt.crypt(passwd)
-    rt=rshell('''echo '%s:%s' | chpasswd -e'''%(username,pass_env))
+    rt=km.rshell('''echo '%s:%s' | chpasswd -e'''%(username,pass_env))
     if rt[0]==0:
         return True
     return False
@@ -164,14 +146,20 @@ def otp_remain_time(myotp):
         pass
     return False
 
-def send_otp_to_email(myotp,email_title='OTP',email_addr=None,local=False,minimum_time=20):
+def send_otp_to_email(myotp,email_title='OTP',email_addr=None,local=False,minimum_time=20,sender=None,local_domain=None,check_domain=True):
     rt=False,'NA'
-    if is_right_email(email_addr,local=local):
+    email_address=km.EmailAddress(email_addr,check_domain=check_domain)
+    if email_address[0]:
+        ok,sender=km.EmailAddress(sender,local=local)
+        email=km.EMAIL()
         for i in range(0,30):
             if otp_remain_time(myotp) > minimum_time:
-                rt=rshell('''echo {} | mail -s "{}" {}'''.format(myotp.now(),email_title,email_addr))
-                if rt[0] == 0:
+                aa=email.Send(email_address[1],sender=sender,title=email_title,msg='{}'.format(myotp.now()),html=False)
+                if aa is True:
                     return True,'OK'
+#                rt=rshell('''echo {} | mail -s "{}" {}'''.format(myotp.now(),email_title,email_addr))
+#                if rt[0] == 0:
+#                    return True,'OK'
             time.sleep(1)
     return False,rt[1]
 
@@ -188,3 +176,12 @@ def gen_otp_key():
 " DISALLOW_REUSE 56607154 56607155
 " TOTP_AUTH
 '''.format(pyotp.random_base32())
+
+def OTP_QRCODE(myotp,username,issuer_name='G2FA',width=80,height=80):
+    otp_url=myotp.provisioning_uri(name=username, issuer_name=issuer_name)
+    return '''<img id='barcode'
+            src="https://api.qrserver.com/v1/create-qr-code/?data={};size=100x100"
+            alt=""
+            title="OTP"
+            width="{}"
+            height="{}" />'''.format(otp_url,width,height)
