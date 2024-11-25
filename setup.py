@@ -30,7 +30,7 @@ def lib_ver():
             return ver_a[1]
     return 1.0
 
-pkg_name='kAuth'
+pkg_name='kauth'
 pkg_desc='Authentication'
 pkg_git="https://github.com/kagepark/kAuth"
 long_description=''

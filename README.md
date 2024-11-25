@@ -4,7 +4,7 @@ So, suddenly it will be big change when I got some more good idea.
 
 # Install
 ```javascript
-pip3 install kAuth
+pip3 install kauth
 ```
 
 # Custom Dictionary Class
